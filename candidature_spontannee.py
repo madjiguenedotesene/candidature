@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 22 17:59:36 2025
-
-@author: madjiguenedotesene
-"""
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -102,12 +95,13 @@ def naviguer_candidature_spontanee(driver, metier="Ingénieur / Ingénieure tél
         WebDriverWait(driver, 6).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "li[id^='result-']"))
         )
-        nombre_candidatures = 10000
+        nombre_candidatures = 100000
         candidatures_effectuees = 0
         page_number = 1
-        for j in range(1, 10000):
+        for j in range(1, 100000):
             id_page = "/page/next"
             # Navigation de page
+            id_suivant = f"page-{j}"
             if candidatures_effectuees < nombre_candidatures:
                 try:
                     next_page_button = WebDriverWait(driver, 1).until(
@@ -188,6 +182,24 @@ def naviguer_candidature_spontanee(driver, metier="Ingénieur / Ingénieure tél
                                             EC.element_to_be_clickable((By.ID, "search"))
                                         )
                                         trouve_travail_again.click()
+                                        if result_id == f"result-{5}" :
+                                            next_page_button = WebDriverWait(driver, 1).until(
+                                                EC.element_to_be_clickable((By.ID, id_page))  # Utilisez l'ID correct
+                                            )
+                                            next_page_button.click()
+
+                                        if id_page < id_suivant :
+                                            next_page_button = WebDriverWait(driver, 1).until(
+                                                EC.element_to_be_clickable((By.ID, id_page))  # Utilisez l'ID correct
+                                            )
+                                            next_page_button.click()
+
+
+
+                                        WebDriverWait(driver, 1).until(
+                                            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "li[id^='result-']"))
+                                        )
+                                        time.sleep(1)
 
                                         WebDriverWait(driver, 1).until(
                                             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "li[id^='result-']"))
@@ -279,13 +291,13 @@ def naviguer_candidature_spontanee(driver, metier="Ingénieur / Ingénieure tél
         traceback.print_exc()
         return False
 
-
+#10494702849
 if __name__ == '__main__':
-    mon_identifiant = "Madjiguene19"
+    mon_identifiant = "10505342718"
     mon_mot_de_passe = "Dote96200@"
     metier_rechercher = "Ingénieur / Ingénieure télécoms"
     localisation = "Île-de-France"
-    nombre_candidatures_souhaitees = 80000
+    nombre_candidatures_souhaitees = 8000000
 
     driver = se_connecter_labonneboite(mon_identifiant, mon_mot_de_passe)
     if driver:
