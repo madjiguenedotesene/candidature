@@ -1,0 +1,136 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[margin=0.8cm]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fontawesome5}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{graphicx}
+
+% --- CONFIGURATION COULEURS ---
+\definecolor{primary}{RGB}{ {{ color_primary }} } 
+\definecolor{accent}{RGB}{ {{ color_accent }} }
+\definecolor{lightgray}{RGB}{240, 240, 240}
+\definecolor{secondary}{RGB}{100, 100, 100}
+
+% --- FORMATAGE ---
+\titleformat{\section}{\color{primary}\large\bfseries\uppercase}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{4pt}{3pt}
+
+\titleformat{\subsection}{\color{primary}\large\bfseries}{}{0em}{}
+\titlespacing{\subsection}{0pt}{4pt}{3pt}
+
+\setlist[itemize]{leftmargin=1.2em, nosep, label=\small\color{accent}$\bullet$, itemsep=1pt}
+
+\begin{document}
+
+% --- EN-TÊTE ---
+\begin{minipage}[c]{0.22\textwidth}
+    \begin{tikzpicture}
+        \clip (0,0) circle (1.4cm);
+        \node at (0,0) {\includegraphics[width=2.8cm]{cv.png}};
+        \draw[accent, line width=0.5pt] (0,0) circle (1.4cm);
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}[c]{0.75\textwidth}
+    {\Huge \bfseries \color{accent} {{ titre_job }} } \\[0.1cm]
+    {\LARGE \bfseries \color{primary} {{ prenom }} {{ nom }} } \\[0.15cm]
+ 
+    \small \color{secondary}
+    \faCalendar* {{ age }} ans \quad
+    \faPhone* {{ telephone }} \quad 
+    \faEnvelope \href{mailto:{{ email }}}{ {{ email }} } \quad 
+    \faMapMarker* {{ ville }} \quad {%- if reseaux|length > 0 -%}{%- for r in reseaux %} \faLink \href{ {{ r.url }} }{ {{ r.nom }} } \quad {% endfor -%}{%- endif -%}
+\end{minipage}
+
+
+\vspace{10pt}
+\vspace{0.1cm}
+
+% --- PROFIL ---
+{% if profil_text|length > 0 %}
+\section{Profil Professionnel}
+{{ profil_text }}
+\vspace{0.1cm}
+{% endif %}
+
+% --- EXPERTISES ---
+{% if competences|length > 0 %}
+\section{Compétences Techniques}
+\begin{itemize}
+{% for comp in competences %}
+    \item \textbf{ {{ comp.categorie }} } : {{ comp.details }}
+{% endfor %}
+\end{itemize}
+\vspace{0.1cm}
+{% endif %}
+
+% --- EXPÉRIENCES ---
+{% if experiences|length > 0 %}
+\section{Expériences Professionnelles}
+{% for exp in experiences %}
+\subsection*{ {{ exp.poste }} | {{ exp.entreprise }} \hfill \textbf{ {{ exp.date }} } }
+{% if exp.sous_titre %}
+\textbf{ {{ exp.sous_titre }} }
+{% endif %}
+\begin{itemize}
+{% for puce in exp.puces %}
+    \item {{ puce }}
+{% endfor %}
+\end{itemize}
+{% endfor %}
+\vspace{0.1cm}
+{% endif %}
+
+% --- FORMATION ---
+{% if formations|length > 0 %}
+\section{Diplômes et Formations}
+{% for form in formations %}
+\subsection*{ {{ form.titre }} | {{ form.ecole }} \hfill \textbf{ {{ form.date }} } }
+\begin{itemize}
+{% for puce in form.puces %}
+    \item {{ puce }}
+{% endfor %}
+\end{itemize}
+{% endfor %}
+\vspace{0.1cm}
+{% endif %}
+
+% --- CERTIFICATIONS ---
+{% if certifications|length > 0 %}
+\section{Certifications}
+\begin{itemize}
+{% for cert in certifications %}
+    \item \textbf{ {{ cert.titre }} } -- {{ cert.organisme }} \hfill \textbf{ {{ cert.date }} }
+{% endfor %}
+\end{itemize}
+\vspace{0.1cm}
+{% endif %}
+
+% --- RÉALISATIONS / PROJETS ---
+{% if realisations|length > 0 %}
+\section{Projets \& Réalisations}
+{% for proj in realisations %}
+\subsection*{ {{ proj.titre }} \hfill \textbf{ {{ proj.date }} } }
+\textit{ {{ proj.contexte }} }
+\begin{itemize}
+{% for puce in proj.puces %}
+    \item {{ puce }}
+{% endfor %}
+\end{itemize}
+{% endfor %}
+\vspace{0.1cm}
+{% endif %}
+
+% --- ATOUTS ---
+\section{Atouts}
+\begin{itemize}
+\item \textbf{Langues :} {{ langues }}
+\item \textbf{Soft Skills :} {{ soft_skills }}
+\end{itemize}
+
+\end{document}
