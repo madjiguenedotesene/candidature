@@ -1,0 +1,119 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[margin=0.8cm]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fontawesome5}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{graphicx}
+
+% --- CONFIGURATION COULEURS ---
+\definecolor{primary}{RGB}{ 0, 0, 0 } 
+\definecolor{accent}{RGB}{ 212, 175, 55 }
+\definecolor{lightgray}{RGB}{240, 240, 240}
+\definecolor{secondary}{RGB}{100, 100, 100}
+
+% --- FORMATAGE ---
+\titleformat{\section}{\color{primary}\large\bfseries\uppercase}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{4pt}{3pt}
+
+\titleformat{\subsection}{\color{primary}\large\bfseries}{}{0em}{}
+\titlespacing{\subsection}{0pt}{4pt}{3pt}
+
+\setlist[itemize]{leftmargin=1.2em, nosep, label=\small\color{accent}$\bullet$, itemsep=1pt}
+
+\begin{document}
+
+% --- EN-TÊTE ---
+% --- EN-TÊTE SÉCURISÉ ---
+\begin{minipage}[c]{0.22\textwidth}
+    \begin{tikzpicture}
+        \draw[accent, line width=0.5pt] (0,0) circle (1.4cm);
+        \IfFileExists{cv.png}{
+            \clip (0,0) circle (1.4cm);
+            \node at (0,0) {\includegraphics[width=2.8cm]{cv.png}};
+        }{
+            % Affiche une icône utilisateur si cv.png manque
+            \node at (0,0) {\Huge\color{accent}\faUser};
+        }
+    \end{tikzpicture}
+\end{minipage}
+\begin{minipage}[c]{0.75\textwidth}
+    {\Huge \bfseries \color{accent} DATA ANALYST } \\[0.1cm]
+    {\LARGE \bfseries \color{primary} Jean Dupont } \\[0.15cm]
+ 
+    \small \color{secondary}
+    \faCalendar* 25 ans \quad
+    \faPhone* +33 6 00 00 00 00 \quad 
+    \faEnvelope \href{mailto:jean@email.com}{ jean@email.com } \quad 
+    \faMapMarker* Paris \quad \faLink \href{  }{ LinkedIn } \quad \end{minipage}
+
+
+\vspace{10pt}
+\vspace{0.1cm}
+
+% --- PROFIL ---
+
+\section{Profil Professionnel}
+Expert en data...
+\vspace{0.1cm}
+
+
+% --- EXPERTISES ---
+
+\section{Compétences Techniques}
+\begin{itemize}
+
+    \item \textbf{  } : 
+
+\end{itemize}
+\vspace{0.1cm}
+
+
+% --- EXPÉRIENCES ---
+
+\section{Expériences Professionnelles}
+
+\subsection*{  |  \hfill \textbf{  } }
+
+\begin{itemize}
+
+    \item 
+
+\end{itemize}
+
+\vspace{0.1cm}
+
+
+% --- FORMATION ---
+
+\section{Diplômes et Formations}
+
+\subsection*{  |  \hfill \textbf{  } }
+\begin{itemize}
+
+    \item 
+
+\end{itemize}
+
+\vspace{0.1cm}
+
+
+% --- CERTIFICATIONS ---
+
+
+% --- RÉALISATIONS / PROJETS ---
+
+
+% --- ATOUTS ---
+\section{Atouts}
+\begin{itemize}
+\item \textbf{Langues :} Anglais : Courant
+\item \textbf{Soft Skills :} Autonomie, Rigueur
+\end{itemize}
+
+\end{document}
