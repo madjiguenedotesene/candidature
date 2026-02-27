@@ -1,3 +1,4 @@
+import io
 import streamlit as st
 import jinja2
 import os
@@ -226,12 +227,18 @@ with col_form:
         color_primary_hex = c1.color_picker("Couleur Principale (Titres)", "#000000")
         color_accent_hex = c2.color_picker("Couleur Secondaire (Puces, Icônes)", "#D4AF37")
         
-        photo_upload = st.file_uploader("🖼️ Photo de Profil (Auto-recadrée en cercle)", type=["png", "jpg", "jpeg"])
+        photo_upload = st.file_uploader("🖼️ PHOTO DE PROFIL", type=["png", "jpg", "jpeg"])
+
         if photo_upload:
-            Image.open(photo_upload).convert("RGB").save("cv.png")
-        else:
-            if not os.path.exists("cv.png"):
-                Image.new('RGB', (100, 100), color=(255, 255, 255)).save("cv.png")
+            # On lit l'image sans l'écrire sur le disque
+            img = Image.open(photo_upload).convert("RGB")
+            # On la prépare pour LaTeX en tant que flux de données
+            img_byte_arr = io.BytesIO()
+            img.save(img_byte_arr, format='PNG')
+            # On peut toujours sauvegarder localement si on est en DEV
+            with open("cv.png", "wb") as f:
+                f.write(img_byte_arr.getvalue())
+            st.success("PHOTO CHARGÉE AVEC SUCCÈS")
 
     with st.expander("👤 Informations Personnelles & Contacts"):
         c3, c4 = st.columns(2)
