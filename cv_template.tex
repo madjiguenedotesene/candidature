@@ -29,11 +29,17 @@
 \begin{document}
 
 % --- EN-TÊTE ---
+% --- EN-TÊTE SÉCURISÉ ---
 \begin{minipage}[c]{0.22\textwidth}
     \begin{tikzpicture}
-        \clip (0,0) circle (1.4cm);
-        \node at (0,0) {\includegraphics[width=2.8cm]{cv.png}};
         \draw[accent, line width=0.5pt] (0,0) circle (1.4cm);
+        \IfFileExists{cv.png}{
+            \clip (0,0) circle (1.4cm);
+            \node at (0,0) {\includegraphics[width=2.8cm]{cv.png}};
+        }{
+            % Affiche une icône utilisateur si cv.png manque
+            \node at (0,0) {\Huge\color{accent}\faUser};
+        }
     \end{tikzpicture}
 \end{minipage}
 \begin{minipage}[c]{0.75\textwidth}
@@ -63,7 +69,7 @@
 \section{Compétences Techniques}
 \begin{itemize}
 {% for comp in competences %}
-    \item \textbf{ {{ comp.categorie }} } : {{ comp.details }}
+    \item \textbf {{ comp.details }}
 {% endfor %}
 \end{itemize}
 \vspace{0.1cm}
@@ -116,7 +122,6 @@
 \section{Projets \& Réalisations}
 {% for proj in realisations %}
 \subsection*{ {{ proj.titre }} \hfill \textbf{ {{ proj.date }} } }
-\textit{ {{ proj.contexte }} }
 \begin{itemize}
 {% for puce in proj.puces %}
     \item {{ puce }}
