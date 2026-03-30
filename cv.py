@@ -14,21 +14,17 @@ st.set_page_config(page_title="ELANPRO | ARCHITECTE CV", page_icon="🔹", layou
 
 st.markdown("""
 <style>
-    .stApp { background-color: #000000 !important; }
-    .block-container {
-        background-color: #F8FAFC; 
+    .stApp { background-color: white !important; }
+    .main .block-container {
+        background-color: #F8FAFC !important; 
         padding: 40px !important;
         border: 2px solid #334155; 
         border-radius: 20px;
-        margin-top: 20px;
-        margin-bottom: 20px;
+        margin: 20px auto !important;
         box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
+        max-width: 95% !important;
     }
-    [data-testid="stSidebar"] { 
-        background-color: #0F172A !important; 
-        min-width: 180px !important;
-        max-width: 220px !important;
-    }
+    [data-testid="stSidebar"] { background-color: #0F172A !important; }
     [data-testid="stSidebar"] * { color: white !important; }
     .stWidget label p {
         color: #1E293B !important; 
@@ -56,7 +52,9 @@ DB_FILE = "data_omni_bot.json"
 
 def charger_donnees():
     if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r", encoding="utf-8") as f: return json.load(f)
+        try:
+            with open(DB_FILE, "r", encoding="utf-8") as f: return json.load(f)
+        except: return {}
     return {}
 
 db = charger_donnees()
@@ -72,9 +70,9 @@ if "reseaux" not in st.session_state: st.session_state.reseaux = db.get("reseaux
 if "competences" not in st.session_state: st.session_state.competences = db.get("competences", [{"details": "OUTILS"}])
 if "experiences" not in st.session_state: st.session_state.experiences = db.get("experiences", [{"poste": "", "entreprise": "", "date": "", "puces": [""]}])
 if "formations" not in st.session_state: st.session_state.formations = db.get("formations", [{"titre": "", "ecole": "", "date": "", "puces": [""]}])
-if "certifications" not in st.session_state: st.session_state.certifications = db.get("certifications", [{"titre": "", "organisme": "", "puces": [""]}])
+if "certifications" not in st.session_state: st.session_state.certifications = db.get("certifications", [{"titre": "", "organisme": "", "date": "", "puces": [""]}])
 if "realisations" not in st.session_state: st.session_state.realisations = db.get("realisations", [{"titre": "", "puces": [""]}])
-if "langues_list" not in st.session_state: st.session_state.langues_list = db.get("langues_list", ["Anglais : B2"])
+if "langues_list" not in st.session_state: st.session_state.langues_list = db.get("langues_list", ["Anglais"])
 if "soft_list" not in st.session_state: st.session_state.soft_list = db.get("soft_list", ["Autonomie"])
 
 def hex_to_rgb(h):
@@ -86,7 +84,7 @@ def hex_to_rgb(h):
 # ==========================================
 with st.sidebar:
     try:
-        st.image("logon.png", use_container_width=True)
+        st.image("logon.png", width=200)
     except:
         st.title("ELANPRO")
     
@@ -104,7 +102,7 @@ with st.sidebar:
 # ==========================================
 # 4. INTERFACE DE SAISIE
 # ==========================================
-st.markdown(f"## Elanpro votre générateur de CV anti ATS !")
+st.markdown(f"## Elanpro générateur de CV anti ATS !")
 col_in, col_out = st.columns([1, 1])
 
 with col_in:
@@ -137,14 +135,12 @@ with col_in:
             cr1, cr2, cr3 = st.columns([3, 5, 1])
             res["nom"] = cr1.text_input("Nom", res["nom"], key=f"r_n_{i}", label_visibility="collapsed")
             res["url"] = cr2.text_input("URL", res["url"], key=f"r_u_{i}", label_visibility="collapsed")
-            if cr3.button("🗑️", key=f"r_d_{i}"): supprimer_item("reseaux", i); st.rerun()
-        st.button("➕ Lien", on_click=lambda: ajouter_item("reseaux", {"nom": "", "url": ""}))
+            if cr3.button("🗑️", key=f"r_d_{i}"): st.session_state.reseaux.pop(i); st.rerun()
+        if st.button("➕ Ajouter Lien"): st.session_state.reseaux.append({"nom":"", "url":""}); st.rerun()
 
     elif menu == "COMPÉTENCES":
         st.subheader("⚡ Mes Compétences")
-        if isinstance(st.session_state.competences, str): st.session_state.competences = [{"details": st.session_state.competences}]
         for i in range(len(st.session_state.competences)):
-            if not isinstance(st.session_state.competences[i], dict): st.session_state.competences[i] = {"details": ""}
             c1, c2 = st.columns([8, 1])
             st.session_state.competences[i]["details"] = c1.text_input(f"C_{i}", st.session_state.competences[i].get("details", ""), key=f"c_in_{i}", label_visibility="collapsed")
             if c2.button("🗑️", key=f"c_del_{i}"): st.session_state.competences.pop(i); st.rerun()
@@ -160,7 +156,7 @@ with col_in:
                 col1, col2 = st.columns([1,1])
                 if col1.button("+ Mission", key=f"ex_am_{i}"): ex["puces"].append(""); st.rerun()
                 if col2.button("🗑️ Supprimer Expérience", key=f"ex_del_{i}"): st.session_state.experiences.pop(i); st.rerun()
-        st.button("➕ Ajouter une Expérience", on_click=lambda: ajouter_item("experiences", {"poste":"","entreprise":"","date":"","puces":[""]}))
+        st.button("➕ Ajouter Expérience", on_click=lambda: ajouter_item("experiences", {"poste":"","entreprise":"","date":"","puces":[""]}))
 
     elif menu == "FORMATIONS":
         for i, f in enumerate(st.session_state.formations):
@@ -168,11 +164,13 @@ with col_in:
                 f["titre"] = st.text_input("Diplôme", f["titre"], key=f"f_t_{i}")
                 f["ecole"] = st.text_input("École", f["ecole"], key=f"f_e_{i}")
                 f["date"] = st.text_input("Année", f["date"], key=f"f_d_{i}")
+                # --- AJOUT DES PUCES DE DÉTAILS ---
+                st.write("Détails / Projets académiques :")
                 render_puces(f["puces"], f"f_m_{i}")
                 col1, col2 = st.columns([1,1])
                 if col1.button("+ Détail", key=f"f_ad_{i}"): f["puces"].append(""); st.rerun()
                 if col2.button("🗑️ Supprimer Formation", key=f"f_del_{i}"): st.session_state.formations.pop(i); st.rerun()
-        st.button("➕ Ajouter une Formation", on_click=lambda: ajouter_item("formations", {"titre":"","ecole":"","date":"","puces":[""]}))
+        st.button("➕ Ajouter Formation", on_click=lambda: ajouter_item("formations", {"titre":"","ecole":"","date":"","puces":[""]}))
 
     elif menu == "PROJETS":
         for i, pr in enumerate(st.session_state.realisations):
@@ -182,31 +180,31 @@ with col_in:
                 col1, col2 = st.columns([1,1])
                 if col1.button("+ Détail", key=f"pr_ad_{i}"): pr["puces"].append(""); st.rerun()
                 if col2.button("🗑️ Supprimer Projet", key=f"pr_del_{i}"): st.session_state.realisations.pop(i); st.rerun()
-        st.button("➕ Ajouter un Projet", on_click=lambda: ajouter_item("realisations", {"titre":"","puces":[""]}))
+        st.button("➕ Ajouter Projet", on_click=lambda: ajouter_item("realisations", {"titre":"","puces":[""]}))
 
     elif menu == "CERTIFICATIONS":
         for i, ct in enumerate(st.session_state.certifications):
-            with st.expander(f"🏆 {ct['titre'] or 'Certif ' + str(i+1)}", expanded=True):
+            with st.expander(f"🏆 {ct['titre'] or 'Certification ' + str(i+1)}", expanded=True):
                 ct["titre"] = st.text_input("Nom", ct["titre"], key=f"ct_t_{i}")
                 ct["organisme"] = st.text_input("Organisme", ct["organisme"], key=f"ct_o_{i}")
-                render_puces(ct["puces"], f"ct_m_{i}")
+                ct["date"] = st.text_input("Date", ct.get("date", ""), key=f"ct_d_{i}")
                 if st.button("🗑️ Supprimer Certif", key=f"ct_del_{i}"): st.session_state.certifications.pop(i); st.rerun()
-        st.button("➕ Ajouter une Certif", on_click=lambda: ajouter_item("certifications", {"titre":"","organisme":"","puces":[""]}))
+        st.button("➕ Ajouter Certif", on_click=lambda: ajouter_item("certifications", {"titre":"","organisme":"","date":"","puces":[""]}))
 
     elif menu == "ATOUTS":
-        st.subheader("LANGUES")
+        st.subheader("Langues")
         for i, l in enumerate(st.session_state.langues_list):
             c1, c2 = st.columns([9, 1])
             st.session_state.langues_list[i] = c1.text_input(f"L_{i}", l, key=f"l_in_{i}", label_visibility="collapsed")
             if c2.button("🗑️", key=f"l_del_{i}"): st.session_state.langues_list.pop(i); st.rerun()
-        st.button("+ Ajouter Langue", on_click=lambda: st.session_state.langues_list.append(""))
+        st.button("+ Langue", on_click=lambda: st.session_state.langues_list.append(""))
 
-        st.subheader("SOFT SKILLS")
+        st.subheader("Soft Skills")
         for i, s in enumerate(st.session_state.soft_list):
             c1, c2 = st.columns([9, 1])
             st.session_state.soft_list[i] = c1.text_input(f"S_{i}", s, key=f"s_in_{i}", label_visibility="collapsed")
             if c2.button("🗑️", key=f"s_del_{i}"): st.session_state.soft_list.pop(i); st.rerun()
-        st.button("+ Ajouter Soft Skill", on_click=lambda: st.session_state.soft_list.append(""))
+        st.button("+ Soft Skill", on_click=lambda: st.session_state.soft_list.append(""))
 
 # ==========================================
 # 5. GÉNÉRATION PDF
@@ -218,7 +216,7 @@ with col_out:
         "titre_job": st.session_state.get('titre_job', 'Poste'),
         "email": st.session_state.get('email', ''),
         "telephone": st.session_state.get('tel', ''),
-        "ville": st.session_state.get('ville', 'Ville'),
+        "ville": st.session_state.get('ville', 'Paris, France'),
         "age": st.session_state.get('age', '25'),
         "profil_text": st.session_state.get('bio', ''),
         "color_primary": hex_to_rgb(cp), "color_accent": hex_to_rgb(ca),
