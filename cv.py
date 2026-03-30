@@ -14,17 +14,21 @@ st.set_page_config(page_title="ELANPRO | ARCHITECTE CV", page_icon="🔹", layou
 
 st.markdown("""
 <style>
-    .stApp { background-color: white !important; }
-    .main .block-container {
-        background-color: #F8FAFC !important; 
+    .stApp { background-color: #000000 !important; }
+    .block-container {
+        background-color: #F8FAFC; 
         padding: 40px !important;
         border: 2px solid #334155; 
         border-radius: 20px;
-        margin: 20px auto !important;
+        margin-top: 20px;
+        margin-bottom: 20px;
         box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
-        max-width: 95% !important;
     }
-    [data-testid="stSidebar"] { background-color: #0F172A !important; }
+    [data-testid="stSidebar"] { 
+        background-color: #0F172A !important; 
+        min-width: 180px !important;
+        max-width: 220px !important;
+    }
     [data-testid="stSidebar"] * { color: white !important; }
     .stWidget label p {
         color: #1E293B !important; 
@@ -52,9 +56,7 @@ DB_FILE = "data_omni_bot.json"
 
 def charger_donnees():
     if os.path.exists(DB_FILE):
-        try:
-            with open(DB_FILE, "r", encoding="utf-8") as f: return json.load(f)
-        except: return {}
+        with open(DB_FILE, "r", encoding="utf-8") as f: return json.load(f)
     return {}
 
 db = charger_donnees()
@@ -84,7 +86,7 @@ def hex_to_rgb(h):
 # ==========================================
 with st.sidebar:
     try:
-        st.image("logon.png", width=200)
+        st.image("logon.png", use_container_width=True)
     except:
         st.title("ELANPRO")
     
@@ -102,7 +104,7 @@ with st.sidebar:
 # ==========================================
 # 4. INTERFACE DE SAISIE
 # ==========================================
-st.markdown(f"## Elanpro générateur de CV anti ATS !")
+st.markdown(f"## Elanpro votre générateur de CV anti ATS !")
 col_in, col_out = st.columns([1, 1])
 
 with col_in:
@@ -135,11 +137,12 @@ with col_in:
             cr1, cr2, cr3 = st.columns([3, 5, 1])
             res["nom"] = cr1.text_input("Nom", res["nom"], key=f"r_n_{i}", label_visibility="collapsed")
             res["url"] = cr2.text_input("URL", res["url"], key=f"r_u_{i}", label_visibility="collapsed")
-            if cr3.button("🗑️", key=f"r_d_{i}"): st.session_state.reseaux.pop(i); st.rerun()
-        if st.button("➕ Ajouter Lien"): st.session_state.reseaux.append({"nom":"", "url":""}); st.rerun()
+            if cr3.button("🗑️", key=f"r_d_{i}"): supprimer_item("reseaux", i); st.rerun()
+        st.button("➕ Lien", on_click=lambda: ajouter_item("reseaux", {"nom": "", "url": ""}))
 
     elif menu == "COMPÉTENCES":
         st.subheader("⚡ Mes Compétences")
+        if isinstance(st.session_state.competences, str): st.session_state.competences = [{"details": st.session_state.competences}]
         for i in range(len(st.session_state.competences)):
             c1, c2 = st.columns([8, 1])
             st.session_state.competences[i]["details"] = c1.text_input(f"C_{i}", st.session_state.competences[i].get("details", ""), key=f"c_in_{i}", label_visibility="collapsed")
@@ -164,12 +167,7 @@ with col_in:
                 f["titre"] = st.text_input("Diplôme", f["titre"], key=f"f_t_{i}")
                 f["ecole"] = st.text_input("École", f["ecole"], key=f"f_e_{i}")
                 f["date"] = st.text_input("Année", f["date"], key=f"f_d_{i}")
-                # --- AJOUT DES PUCES DE DÉTAILS ---
-                st.write("Détails / Projets académiques :")
-                render_puces(f["puces"], f"f_m_{i}")
-                col1, col2 = st.columns([1,1])
-                if col1.button("+ Détail", key=f"f_ad_{i}"): f["puces"].append(""); st.rerun()
-                if col2.button("🗑️ Supprimer Formation", key=f"f_del_{i}"): st.session_state.formations.pop(i); st.rerun()
+                if st.button("🗑️ Supprimer Formation", key=f"f_del_{i}"): st.session_state.formations.pop(i); st.rerun()
         st.button("➕ Ajouter Formation", on_click=lambda: ajouter_item("formations", {"titre":"","ecole":"","date":"","puces":[""]}))
 
     elif menu == "PROJETS":
@@ -185,21 +183,21 @@ with col_in:
     elif menu == "CERTIFICATIONS":
         for i, ct in enumerate(st.session_state.certifications):
             with st.expander(f"🏆 {ct['titre'] or 'Certification ' + str(i+1)}", expanded=True):
-                ct["titre"] = st.text_input("Nom", ct["titre"], key=f"ct_t_{i}")
+                ct["titre"] = st.text_input("Nom de la certif", ct["titre"], key=f"ct_t_{i}")
                 ct["organisme"] = st.text_input("Organisme", ct["organisme"], key=f"ct_o_{i}")
-                ct["date"] = st.text_input("Date", ct.get("date", ""), key=f"ct_d_{i}")
+                ct["date"] = st.text_input("Date/Année", ct.get("date", ""), key=f"ct_d_{i}")
                 if st.button("🗑️ Supprimer Certif", key=f"ct_del_{i}"): st.session_state.certifications.pop(i); st.rerun()
         st.button("➕ Ajouter Certif", on_click=lambda: ajouter_item("certifications", {"titre":"","organisme":"","date":"","puces":[""]}))
 
     elif menu == "ATOUTS":
-        st.subheader("Langues")
+        st.subheader("LANGUES")
         for i, l in enumerate(st.session_state.langues_list):
             c1, c2 = st.columns([9, 1])
             st.session_state.langues_list[i] = c1.text_input(f"L_{i}", l, key=f"l_in_{i}", label_visibility="collapsed")
             if c2.button("🗑️", key=f"l_del_{i}"): st.session_state.langues_list.pop(i); st.rerun()
         st.button("+ Langue", on_click=lambda: st.session_state.langues_list.append(""))
 
-        st.subheader("Soft Skills")
+        st.subheader("SOFT SKILLS")
         for i, s in enumerate(st.session_state.soft_list):
             c1, c2 = st.columns([9, 1])
             st.session_state.soft_list[i] = c1.text_input(f"S_{i}", s, key=f"s_in_{i}", label_visibility="collapsed")
@@ -211,9 +209,9 @@ with col_in:
 # ==========================================
 with col_out:
     donnees_cv = {
-        "prenom": st.session_state.get('prenom', 'Prénom'),
-        "nom": st.session_state.get('nom', 'Nom'),
-        "titre_job": st.session_state.get('titre_job', 'Poste'),
+        "prenom": st.session_state.get('prenom', 'Madji'),
+        "nom": st.session_state.get('nom', 'SENE'),
+        "titre_job": st.session_state.get('titre_job', 'DATA ANALYST'),
         "email": st.session_state.get('email', ''),
         "telephone": st.session_state.get('tel', ''),
         "ville": st.session_state.get('ville', 'Paris, France'),
